@@ -20,17 +20,26 @@ const logPath = '/home/minecraft/server/logs/latest.log'; // Location of server 
 // const logPath = 'testlog.log'; // Location of server log
 const initialLines = 20; // Initial amount of lines to send to client
 
-// Create a following tail instance on the log file, returning no new lines.
-const tail = spawn('/usr/bin/tail', ['-n0', '-f', logPath]);
-// Create a readline on the tail instance
-const tailReader = readline.createInterface({input: tail.stdout});
-// Broadcast new chat lines to everyone on the io instance
-tailReader.on('line', (line) => {
-    if(line.match(regex)) {
-        console.log('Broadcasting new chat line ', line);
-        io.emit('chat', formatLogLine(line))
-    };
-});
+let tail;
+// Function spawnTail() - spawns the tail process
+// Returns
+// tail process
+const spawnTail = () => {
+    // Create a following tail instance on the log file, returning no new lines.
+    tail = spawn('/usr/bin/tail', ['-n0', '-f', logPath]);    // Create a readline on the tail instance
+    const tailReader = readline.createInterface({input: tail.stdout});
+    // Broadcast new chat lines to everyone on the io instance
+    tailReader.on('line', (line) => {
+        if(line.match(regex)) {
+            console.log('Broadcasting new chat line ', line);
+            io.emit('chat', formatLogLine(line))
+        };
+    });
+    // If the tail fails, respawn tail after timeout
+    tailReader.on('close', () => setTimeout(spawnTail, 1000));
+};
+// Spawn tail
+spawnTail();
 
 // Function getLastChat(n) - gets the last n lines from log
 // Params
