@@ -1,0 +1,26 @@
+html
+  head
+    title= title
+    meta(name='viewport', content='width=device-width, initial-scale=1.0')
+    link(rel='stylesheet', href='https://fonts.googleapis.com/css?family=Roboto')
+    link(rel='stylesheet', href='/stylesheet.css')
+  body
+    div(class='headerbar')
+      h1= title
+    div(class='content')
+      table
+        tbody(id='chat')
+          each line in lines
+            tr
+              td(class='timestamp') !{line[0]}
+              td(class='chatline') !{line[1]}
+      div(class='footer') 
+        p
+          = 'Nick Vella 2018 - '
+          a(href='https://nxk.io')= 'nxk.io'
+          = ' - I\'m aware this looks like crap.'
+        p
+          a(href='https://github.com/nvella/mc-webchat')= 'https://github.com/nvella/mc-webchat'
+      script(src="/socket.io/socket.io.js")
+      script(src="/realtime.js")
+      
